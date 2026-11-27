@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="img/logo.webp">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
 <title>Tina's Bakery Chat</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -34,7 +35,7 @@ input,select,textarea{font-family:inherit;color:var(--ink)}
 /* ---------- top bar ---------- */
 .top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;max-width:1440px;margin:0 auto 14px}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
-.logo{width:46px;height:46px;border-radius:50%;background:var(--brown);color:var(--caramel-soft);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:20px;flex:none}
+.logo{width:46px;height:46px;border-radius:50%;background:var(--brown);object-fit:cover;display:block;flex:none}
 .brand h1{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1;margin:0;color:var(--brown);text-wrap:balance}
 .brand p{margin:4px 0 0;color:var(--ink-2);font-weight:500}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap}
@@ -80,7 +81,10 @@ input,select,textarea{font-family:inherit;color:var(--ink)}
 .chat-item.locked{opacity:.62}
 .chat-item.featured{background:#fbf1e3}
 .avatar{width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;color:var(--white);font-size:16px}
-.avatar.tb{background:var(--brown);font-family:var(--f-display);color:var(--caramel-soft)}
+.avatar.tb{background:var(--brown);object-fit:cover;display:block}
+.head-logo{width:34px;height:34px}
+.thumb img,.cat-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb{overflow:hidden;background:var(--white)}
 .ci-body{flex:1;min-width:0}
 .ci-row{display:flex;justify-content:space-between;gap:6px;align-items:baseline}
 .ci-name{font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -132,7 +136,7 @@ input,select,textarea{font-family:inherit;color:var(--ink)}
 
 .cat-card{width:230px;max-width:100%}
 .cat-cover{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;border-radius:8px;overflow:hidden;margin-bottom:6px}
-.cat-cover span{aspect-ratio:1.5;display:grid;place-items:center;font-size:26px}
+.cat-cover span{aspect-ratio:1.1;display:block;background:var(--white);overflow:hidden}
 .cat-meta b{display:block;font-size:13.5px}
 .cat-meta small{color:var(--ink-2);font-size:12px;font-weight:600}
 .cat-open{margin-top:6px;width:100%;border:0;border-top:1px solid #efe2d3;background:none;padding:8px 0 2px;font-weight:700;color:var(--caramel);font-size:13.5px}
@@ -297,7 +301,7 @@ tr.fresh{animation:fresh 2.4s ease-out}
 
 <header class="top">
   <div class="brand">
-    <div class="logo" aria-hidden="true">TB</div>
+    <img class="logo" src="img/logo.webp" alt="Logo de Tina's Bakery">
     <div>
       <h1>Tina's Bakery · Pedidos por chat</h1>
       <p>Simulación: el cliente escribe, el agente atiende y el pedido llega al panel interno.</p>
@@ -335,16 +339,15 @@ tr.fresh{animation:fresh 2.4s ease-out}
 "use strict";
 /* ================= data ================= */
 const CLIENT_PHONE = '+57 300 555 0142';
-const KEY = 'tinas-chat-sim-v1';
+const KEY = 'tinas-chat-sim-v2';
+const LOGO = 'img/logo.webp';
 const STATUSES = ['Pendiente de revisión','Confirmado','En preparación','Listo para entregar','Entregado','Rechazado o cancelado'];
 const SCLS = {'Pendiente de revisión':'s-pend','Confirmado':'s-conf','En preparación':'s-prep','Listo para entregar':'s-ready','Entregado':'s-done','Rechazado o cancelado':'s-rej'};
 const DEFAULT_CATALOG = [
-  {id:'torta',  name:'Torta Choco Crunch', cat:'Tortas',          desc:'Bizcocho de chocolate, ganache y crocante de chocolate. 12 porciones.', price:95000,  avail:true, emoji:'🍫', hue:'#e9d2bd'},
-  {id:'alfajor',name:'Alfajores de Milo',  cat:'Alfajores',       desc:'Caja de 6 alfajores rellenos de arequipe y cubiertos de Milo.',          price:30000,  avail:true, emoji:'🍪', hue:'#f3dfc4'},
-  {id:'kit',    name:'Kit Celebración',    cat:'Kits especiales', desc:'Mini torta Choco Crunch + 6 alfajores + tarjeta personalizada.',          price:120000, avail:true, emoji:'🎁', hue:'#f4d6cf'},
-  {id:'navidad',name:'Kit Navidad',        cat:'Temporada',       desc:'Edición navideña: galletas decoradas + 4 alfajores en caja de regalo.',   price:85000,  avail:true, emoji:'🎄', hue:'#d7e8d6'}
+  {id:'alfajor',name:'Alfajor de Milo',   cat:'Alfajores', desc:'Galletas suaves rellenas de arequipe y espolvoreadas con Milo. Precio por unidad.', price:5000,  avail:true, emoji:'🍪', img:'img/alfajor.webp'},
+  {id:'torta',  name:'Choco Crunch Cake', cat:'Tortas',    desc:'Bizcocho de chocolate con ganache y crocante de chocolate encima.',            price:10000, avail:true, emoji:'🍫', img:'img/choco-crunch-cake.webp'}
 ];
-const KW = {navidad:/navid|temporada/, kit:/\bkits?\b|combo|celebra/, alfajor:/alfaj|milo/, torta:/torta|choco|crunch|pastel|cake|ponque/};
+const KW = {alfajor:/alfaj|milo/, torta:/torta|choco|crunch|pastel|cake|ponque/};
 const NUMW = [['media docena',6],['docena',12],['un',1],['una',1],['uno',1],['dos',2],['tres',3],['cuatro',4],['cinco',5],['seis',6],['siete',7],['ocho',8],['nueve',9],['diez',10]];
 const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DAYS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -381,10 +384,10 @@ function seedOrders(cat){
   const mk = (o)=>{ o.total=o.items.reduce((a,b)=>a+b.qty*b.price,0); o.example=true; o.source='seed'; return o; };
   const created = n => {const d=addDays(n); d.setHours(10+Math.abs(n),15); return d.toISOString();};
   return [
-    mk({code:'TB-0001', created:created(-4), name:'Valentina Ríos', phone:'+57 301 442 1180', items:[it('torta',1),it('alfajor',2)], date:toISO(addDays(-1)), time:'3–6 p. m.', mode:'Domicilio', address:'Cra 70 #44-21, Laureles', notes:'Escribir "Feliz cumple Pao" en la torta', bday:'12 de abril', bdayMD:[4,12], promo:true, auth:true, pay:'Nequi', payStatus:'Pagado', status:'Entregado'}),
-    mk({code:'TB-0002', created:created(-2), name:'Camilo Restrepo', phone:'+57 315 208 7731', items:[it('kit',1)], date:toISO(addDays(1)), time:'9–12 a. m.', mode:'Recogida', address:'', notes:'', bday:'3 de diciembre', bdayMD:[12,3], promo:true, auth:true, pay:'Transferencia Bancolombia', payStatus:'Pagado', status:'En preparación'}),
-    mk({code:'TB-0003', created:created(-1), name:'Daniela Mejía', phone:'+57 320 611 0094', items:[it('alfajor',4)], date:toISO(addDays(2)), time:'12–3 p. m.', mode:'Domicilio', address:'Calle 10 #32-15, El Poblado', notes:'Son para regalo, sin tarjeta', bday:'', bdayMD:null, promo:false, auth:true, pay:'Daviplata', payStatus:'Pendiente', status:'Confirmado'}),
-    mk({code:'TB-0004', created:created(0), name:'Juliana Ortiz', phone:'+57 304 925 3318', items:[it('navidad',2),it('torta',1)], date:toISO(addDays(3)), time:'3–6 p. m.', mode:'Domicilio', address:'Av. Nutibara #71-40, Belén', notes:'Llamar al llegar', bday:'8 de diciembre', bdayMD:[12,8], promo:true, auth:true, pay:'Efectivo contra entrega', payStatus:'Pendiente', status:'Pendiente de revisión'})
+    mk({code:'TB-0001', created:created(-4), name:'Valentina Ríos', phone:'+57 301 442 1180', items:[it('torta',1),it('alfajor',6)], date:toISO(addDays(-1)), time:'3–6 p. m.', mode:'Domicilio', address:'Cra 70 #44-21, Laureles', notes:'Escribir "Feliz cumple Pao" en la torta', bday:'12 de abril', bdayMD:[4,12], promo:true, auth:true, pay:'Nequi', payStatus:'Pagado', status:'Entregado'}),
+    mk({code:'TB-0002', created:created(-2), name:'Camilo Restrepo', phone:'+57 315 208 7731', items:[it('torta',2)], date:toISO(addDays(1)), time:'9–12 a. m.', mode:'Recogida', address:'', notes:'', bday:'3 de diciembre', bdayMD:[12,3], promo:true, auth:true, pay:'Transferencia Bancolombia', payStatus:'Pagado', status:'En preparación'}),
+    mk({code:'TB-0003', created:created(-1), name:'Daniela Mejía', phone:'+57 320 611 0094', items:[it('alfajor',12)], date:toISO(addDays(2)), time:'12–3 p. m.', mode:'Domicilio', address:'Calle 10 #32-15, El Poblado', notes:'Son para regalo, sin tarjeta', bday:'', bdayMD:null, promo:false, auth:true, pay:'Daviplata', payStatus:'Pendiente', status:'Confirmado'}),
+    mk({code:'TB-0004', created:created(0), name:'Juliana Ortiz', phone:'+57 304 925 3318', items:[it('alfajor',4),it('torta',1)], date:toISO(addDays(3)), time:'3–6 p. m.', mode:'Domicilio', address:'Av. Nutibara #71-40, Belén', notes:'Llamar al llegar', bday:'8 de diciembre', bdayMD:[12,8], promo:true, auth:true, pay:'Efectivo contra entrega', payStatus:'Pendiente', status:'Pendiente de revisión'})
   ];
 }
 function load(){
@@ -428,7 +431,7 @@ function buildPhone(el, who){
     <div class="view v-chat" hidden>
       <div class="chat-head">
         <button class="icon-btn back" type="button" aria-label="Volver a chats">${I.back}</button>
-        <div class="avatar ${who==='client'?'tb':''}" ${who==='biz'?'style="background:#c98a4b"':''}>${who==='client'?'TB':'C'}</div>
+        ${who==='client'?`<img class="avatar tb" src="${LOGO}" alt="Tina's Bakery">`:'<div class="avatar" style="background:#c98a4b">C</div>'}
         <div class="ch-info"><div class="ch-name"></div><div class="ch-status"></div></div>
         ${who==='biz'?`<button class="agent-switch" type="button" aria-pressed="true" title="Encender o apagar el agente">Agente IA <i></i></button>`:`<button class="icon-btn" type="button" aria-label="Más opciones">${I.dots}</button>`}
       </div>
@@ -481,7 +484,7 @@ function renderList(who){
   const unread = who==='client'?S.unreadClient:S.unreadBiz;
   const mainName = who==='client' ? "Tina's Bakery" : (S.clientName || CLIENT_PHONE);
   const main = `<button class="chat-item featured" data-main="1" type="button">
-      <div class="avatar ${who==='client'?'tb':''}" ${who==='biz'?'style="background:#c98a4b"':''}>${who==='client'?'TB':esc((S.clientName||'C')[0])}</div>
+      ${who==='client'?`<img class="avatar tb" src="${LOGO}" alt="Tina's Bakery">`:`<div class="avatar" style="background:#c98a4b">${esc((S.clientName||'C')[0])}</div>`}
       <div class="ci-body"><div class="ci-row"><span class="ci-name">${esc(mainName)}${who==='client'?' ✔':''}</span><span class="ci-time ${unread?'new':''}">${lm?esc(lm.time):''}</span></div>
       <div class="ci-row"><span class="ci-prev">${esc(previewOf(lm,who))}</span>${unread?`<span class="badge">${unread}</span>`:(who==='client'?'<span class="pin">fijado</span>':(lm?'':'<span class="pin">nuevo</span>'))}</div></div></button>`;
   const others = (who==='client'?CLIENT_CHATS:BIZ_OTHERS).map(c=>`<button class="chat-item locked" type="button" aria-disabled="true">
@@ -489,7 +492,7 @@ function renderList(who){
       <div class="ci-body"><div class="ci-row"><span class="ci-name">${esc(c.n)}</span><span class="ci-time">${esc(c.t)}</span></div>
       <div class="ci-row"><span class="ci-prev">${esc(c.p)}</span>${c.u?`<span class="badge" style="background:#b9a491">${c.u}</span>`:''}</div></div></button>`).join('');
   P.list.innerHTML = `
-    <div class="app-head"><h2>${who==='client'?'Chats':"Tina's Bakery"}${who==='biz'?'<div class="sub">Cuenta de empresa · agente '+(S.agentOn?'activo 🤖':'apagado')+'</div>':''}</h2>
+    <div class="app-head">${who==='biz'?`<img class="avatar tb head-logo" src="${LOGO}" alt="">`:''}<h2>${who==='client'?'Chats':"Tina's Bakery"}${who==='biz'?'<div class="sub">Cuenta de empresa · agente '+(S.agentOn?'activo 🤖':'apagado')+'</div>':''}</h2>
       <button class="icon-btn" type="button" aria-label="Buscar">${I.search}</button><button class="icon-btn" type="button" aria-label="Más opciones">${I.dots}</button></div>
     <div class="searchbar">${I.search} Buscar</div>
     <div class="filters"><span class="on">Todos</span><span>No leídos</span><span>${who==='client'?'Favoritos':'Clientes'}</span><span>Grupos</span></div>
@@ -504,7 +507,7 @@ function msgHTML(m, view){
   let body;
   if(m.type==='catalog'){
     const av=S.catalog.filter(p=>p.avail);
-    body = `<div class="cat-card"><div class="cat-cover">${av.slice(0,4).map(p=>`<span style="background:${p.hue}">${p.emoji}</span>`).join('')}</div>
+    body = `<div class="cat-card"><div class="cat-cover">${av.slice(0,4).map(p=>`<span><img src="${p.img}" alt="${esc(p.name)}"></span>`).join('')}</div>
       <div class="cat-meta"><b>Catálogo Tina's Bakery 🍰</b><small>${av.length} productos · desde ${money(Math.min(...av.map(p=>p.price)))}</small></div>
       ${view==='client'?'<button class="cat-open" type="button" data-open-cat>Ver catálogo</button>':'<div class="cat-sent">📖 Catálogo enviado al cliente</div>'}</div>`;
   } else body = `<div class="txt">${rich(m.text)}</div>`;
@@ -585,7 +588,7 @@ function qtyOf(s){
 function parseItems(t){
   const segs = t.split(/,|;|\+|\n|\s(?:y|e|mas|tambien)\s/);
   const out={};
-  for(const s of segs){ for(const id of ['navidad','kit','alfajor','torta']){ if(KW[id].test(s)){ out[id]=(out[id]||0)+qtyOf(s); break; } } }
+  for(const s of segs){ for(const id of ['alfajor','torta']){ if(KW[id].test(s)){ out[id]=(out[id]||0)+qtyOf(s); break; } } }
   return out;
 }
 function parseDate(t){
@@ -632,7 +635,7 @@ function greet(){
     {text:'¡Hola! 👋 ¿Cómo estás? Bienvenid@ a *Tina\'s Bakery* 🍰✨'},
     {text:'Te comparto nuestro catálogo 📖👇'},
     {type:'catalog'},
-    {text:'Cuéntame, ¿qué te gustaría llevar? 😋\nToca *Ver catálogo* o escríbeme, por ejemplo: _1 torta choco crunch y 2 cajas de alfajores_'.replace(/_/g,'')}
+    {text:'Cuéntame, ¿qué te gustaría llevar? 😋\nToca *Ver catálogo* o escríbeme, por ejemplo: _1 Choco Crunch Cake y 6 alfajores de Milo_'.replace(/_/g,'')}
   ]);
 }
 function acceptItems(items){
@@ -772,7 +775,7 @@ function openSheet(){
   w.innerHTML=`<div class="sheet" role="dialog" aria-label="Catálogo">
     <div class="sheet-head"><b>Catálogo Tina's Bakery</b><button class="icon-btn" type="button" data-x aria-label="Cerrar">${I.close}</button></div>
     <div class="sheet-body">${groups.map(g=>`<div class="cat-group">${esc(g)}</div>`+S.catalog.filter(p=>p.cat===g).map(p=>`
-      <div class="prod ${p.avail?'':'off'}"><div class="thumb" style="background:${p.hue}">${p.emoji}</div>
+      <div class="prod ${p.avail?'':'off'}"><div class="thumb"><img src="${p.img}" alt="${esc(p.name)}"></div>
         <div class="prod-info"><b>${esc(p.name)}</b><p>${esc(p.desc)}</p><span class="price">${p.avail?money(p.price):'Agotado'}</span></div>
         ${p.avail?`<div class="stepper"><button type="button" data-dec="${p.id}" aria-label="Quitar">−</button><output data-q="${p.id}">0</output><button type="button" data-inc="${p.id}" aria-label="Agregar">+</button></div>`:''}
       </div>`).join('')).join('')}</div>
@@ -807,7 +810,7 @@ function deliv(o){ return (o.date?prettyDate(o.date):esc(o.dateText||'—')) + (
 
 function renderAdmin(){
   if(!S.logged){
-    panel.innerHTML=`<div class="p-head"><div class="ttl"><div class="logo" style="width:36px;height:36px;font-size:15px">TB</div><div><b>Pedidos Tina's Bakery</b><small>Panel privado</small></div></div></div>
+    panel.innerHTML=`<div class="p-head"><div class="ttl"><img class="logo" style="width:36px;height:36px" src="img/logo.webp" alt=""><div><b>Pedidos Tina's Bakery</b><small>Panel privado</small></div></div></div>
     <div class="login"><form id="login-form">
       <h3>Iniciar sesión</h3><p>Acceso compartido para Martina y Sara</p>
       <div class="field"><label for="lg-user">Usuario</label><input id="lg-user" value="tinasbakery" autocomplete="off"></div>
@@ -822,7 +825,7 @@ function renderAdmin(){
     return;
   }
   const tabs=[['orders','Pedidos'],['prod','Producción'],['clients','Clientes'],['catalog','Catálogo']];
-  panel.innerHTML=`<div class="p-head"><div class="ttl"><div class="logo" style="width:36px;height:36px;font-size:15px">TB</div><div><b>Pedidos Tina's Bakery</b><small>Sesión: Martina y Sara</small></div></div>
+  panel.innerHTML=`<div class="p-head"><div class="ttl"><img class="logo" style="width:36px;height:36px" src="img/logo.webp" alt=""><div><b>Pedidos Tina's Bakery</b><small>Sesión: Martina y Sara</small></div></div>
     <nav class="p-nav" role="tablist">${tabs.map(([k,l])=>`<button role="tab" type="button" data-ptab="${k}" aria-selected="${S.ptab===k}">${l}</button>`).join('')}<button type="button" data-logout>Salir</button></nav></div>
     <div class="p-body" id="p-body"></div>`;
   panel.querySelectorAll('[data-ptab]').forEach(b=>b.addEventListener('click',()=>{ S.ptab=b.dataset.ptab; save(); renderAdmin(); }));
@@ -938,7 +941,7 @@ function renderClients(body){
 function renderCatalog(body){
   body.innerHTML=`<p class="section-note">Edita precios, descripciones y disponibilidad. El agente usa estos datos en tiempo real cuando envía el catálogo.</p>
     <div class="cat-admin">${S.catalog.map(p=>`<div class="cat-row">
-      <div class="thumb" style="background:${p.hue}">${p.emoji}</div>
+      <div class="thumb"><img src="${p.img}" alt="${esc(p.name)}"></div>
       <div class="fields"><small>${esc(p.cat)}</small><b>${esc(p.name)}</b><textarea id="desc-${p.id}" data-desc="${p.id}" rows="2" aria-label="Descripción de ${esc(p.name)}">${esc(p.desc)}</textarea></div>
       <div class="field price-cell"><label for="price-${p.id}">Precio (COP)</label><input id="price-${p.id}" type="number" min="0" step="1000" value="${p.price}" data-price="${p.id}"></div>
       <div class="avail-cell"><button type="button" class="toggle" data-avail="${p.id}" aria-pressed="${p.avail}"><i></i>${p.avail?'Disponible':'Agotado'}</button></div>
@@ -978,7 +981,7 @@ $('#btn-demo').addEventListener('click',async()=>{
   if(S.flow.step!=='idle' && S.flow.step!=='done'){ S.flow.step='done'; S.flow.draft=newDraft(); }
   S.agentOn=true; S.clientView='chat'; S.bizView='chat'; S.unreadBiz=0; S.unreadClient=0; save(); renderAll();
   const sat = dateButtons()[1];
-  const script=['Hola, buenas tardes 😊','Quiero 1 torta choco crunch y 2 cajas de alfajores','🛵 Domicilio','Calle 10 #32-15, apto 502, El Poblado',sat,'3–6 p. m.','Laura Gómez','Nequi','Que diga "Feliz cumpleaños Mami" 🎂','✅ Sí, autorizo','14/03','Sí, quiero','✅ Enviar pedido'];
+  const script=['Hola, buenas tardes 😊','Quiero 2 choco crunch cake y 6 alfajores de milo','🛵 Domicilio','Calle 10 #32-15, apto 502, El Poblado',sat,'3–6 p. m.','Laura Gómez','Nequi','Que diga "Feliz cumpleaños Mami" 🎂','✅ Sí, autorizo','14/03','Sí, quiero','✅ Enviar pedido'];
   for(const line of script){
     if(!demoRunning) return;
     await queue; await sleep(900);
